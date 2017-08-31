@@ -59,11 +59,11 @@ var ProductSchema = new Schema({
             }
         }]
     },
-    // shopseller: {
-    //     required: 'Please fill Product shopseller',
-    //     type: Schema.ObjectId,
-    //     ref: 'Shop'
-    // },
+    shopseller: {
+        required: 'Please fill Product shopseller',
+        type: Schema.ObjectId,
+        ref: 'Shop'
+    },
     // shippings: {
     //     required: 'Please fill Product shippings',
     //     type: [{

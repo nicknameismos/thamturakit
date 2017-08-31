@@ -6,12 +6,14 @@
 var should = require('should'),
     mongoose = require('mongoose'),
     User = mongoose.model('User'),
+    Shop = mongoose.model('Shop'),
     Product = mongoose.model('Product');
 
 /**
  * Globals
  */
 var user,
+    shop,
     product;
 
 /**
@@ -28,37 +30,48 @@ describe('Product Model Unit Tests:', function() {
             password: 'password'
         });
 
-        user.save(function() {
-            product = new Product({
-                name: 'Product Name',
-                detail: 'Product detail',
-                price: 100,
-                qty: 10,
-                image: [{
-                    url: 'img url',
-                    id: 'img id'
-                }],
-                preparedays: 10,
-                favorite: [{
-                    customerid: user,
-                    favdate: new Date('2017-08-21')
-                }],
-                historylog: [{
-                    customerid: user,
-                    hisdate: new Date('2017-08-21')
-                }],
-                // shippings: [{
-                //     shipping: shipping,
-                //     shippingprice: 10,
-                //     shippingstartdate: new Date('2017-08-21'),
-                //     shippingenddate: new Date('2017-08-21')
-                // }],
-                // shopseller: shop,
-                user: user
+        shop = new Shop({
+            name: 'Shop name',
+            detail: 'Shop detail',
+            email: 'Shop email',
+            tel: 'Shop tel',
+            image: [{
+                url: 'img url'
+            }],
+            map: {
+                lat: 'map lat',
+                lng: 'map lng'
+            },
+        });
 
+        user.save(function() {
+            shop.save(function() {
+                product = new Product({
+                    name: 'Product Name',
+                    detail: 'Product detail',
+                    price: 100,
+                    qty: 10,
+                    image: [{
+                        url: 'img url',
+                        id: 'img id'
+                    }],
+                    preparedays: 10,
+                    favorite: [{
+                        customerid: user,
+                        favdate: new Date('2017-08-21')
+                    }],
+                    historylog: [{
+                        customerid: user,
+                        hisdate: new Date('2017-08-21')
+                    }],
+                    shopseller: shop,
+                    user: user
+
+                });
+
+                done();
             });
 
-            done();
         });
     });
 
@@ -110,8 +123,10 @@ describe('Product Model Unit Tests:', function() {
 
     afterEach(function(done) {
         Product.remove().exec(function() {
-            User.remove().exec(function() {
-                done();
+            Shop.remove().exec(function() {
+                User.remove().exec(function() {
+                    done();
+                });
             });
         });
     });
