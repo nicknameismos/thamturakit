@@ -39,6 +39,18 @@ var ShopSchema = new Schema({
             type: String
         }
     },
+    historylog: {
+        type: [{
+            customerid: {
+                type: Schema.ObjectId,
+                ref: 'User'
+            },
+            hisdate: {
+                type: Date,
+                default: Date.now
+            }
+        }]
+    },
     created: {
         type: Date,
         default: Date.now

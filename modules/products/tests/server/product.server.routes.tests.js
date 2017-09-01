@@ -7,6 +7,7 @@ var should = require('should'),
     User = mongoose.model('User'),
     Product = mongoose.model('Product'),
     Shop = mongoose.model('Shop'),
+    Shipping = mongoose.model('Shipping'),
     express = require(path.resolve('./config/lib/express'));
 
 /**
@@ -17,6 +18,7 @@ var app,
     credentials,
     user,
     shop,
+    shipping,
     product;
 
 /**
@@ -64,33 +66,46 @@ describe('Product CRUD tests', function() {
             },
         });
 
+        shipping = new Shipping({
+            name: 'shipping name',
+            detail: 'shipping detail',
+            days: 10,
+            price: 50
+        });
+
         // Save a user to the test db and create new Product
         user.save(function() {
             shop.save(function() {
-                product = {
-                    name: 'Product name',
-                    detail: 'Product detail',
-                    price: 100,
-                    qty: 10,
-                    image: [{
-                        url: 'img url',
-                        id: 'img id'
-                    }],
-                    preparedays: 10,
-                    favorite: [{
-                        customerid: user,
-                        favdate: new Date('2017-08-21')
-                    }],
-                    historylog: [{
-                        customerid: user,
-                        hisdate: new Date('2017-08-21')
-                    }],
-                    shopseller: shop,
-                };
+                shipping.save(function() {
+                    product = {
+                        name: 'Product name',
+                        detail: 'Product detail',
+                        price: 100,
+                        qty: 10,
+                        image: [{
+                            url: 'img url',
+                            id: 'img id'
+                        }],
+                        preparedays: 10,
+                        favorite: [{
+                            customerid: user,
+                            favdate: new Date('2017-08-21')
+                        }],
+                        historylog: [{
+                            customerid: user,
+                            hisdate: new Date('2017-08-21')
+                        }],
+                        shippings: [{
+                            shipping: shipping,
+                            shippingstartdate: new Date('2017-08-21'),
+                            shippingenddate: new Date('2017-08-21')
+                        }],
+                        shopseller: shop,
+                    };
 
-                done();
+                    done();
+                });
             });
-
         });
     });
 
@@ -141,6 +156,12 @@ describe('Product CRUD tests', function() {
                                 (products[0].favorite[0].favdate).should.match(product.favorite[0].favdate);
                                 (products[0].historylog[0].customerid).should.match(userId);
                                 (products[0].historylog[0].hisdate).should.match(product.historylog[0].hisdate);
+                                (products[0].shippings[0].shipping.name).should.match('shipping name');
+                                (products[0].shippings[0].shipping.detail).should.match('shipping detail');
+                                (products[0].shippings[0].shipping.days).should.match(10);
+                                // (products[0].shippings[0].shipping.price).should.match(50);
+                                (products[0].shippings[0].shippingstartdate).should.match(new Date('2017-08-21'));
+                                (products[0].shippings[0].shippingenddate).should.match(new Date('2017-08-21'));
                                 // Call the assertion callback
                                 done();
                             });
@@ -451,7 +472,9 @@ describe('Product CRUD tests', function() {
     afterEach(function(done) {
         User.remove().exec(function() {
             Shop.remove().exec(function() {
-                Product.remove().exec(done);
+                Shipping.remove().exec(function() {
+                    Product.remove().exec(done);
+                });
             });
         });
     });

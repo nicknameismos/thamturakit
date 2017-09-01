@@ -6,6 +6,7 @@ var should = require('should'),
     mongoose = require('mongoose'),
     User = mongoose.model('User'),
     Shop = mongoose.model('Shop'),
+    Product = mongoose.model('Product'),
     express = require(path.resolve('./config/lib/express'));
 
 /**
@@ -15,6 +16,7 @@ var app,
     agent,
     credentials,
     user,
+    product,
     shop;
 
 /**
@@ -48,6 +50,26 @@ describe('Shop CRUD tests', function() {
             provider: 'local'
         });
 
+        product = new Product({
+            name: 'Product name',
+            detail: 'Product detail',
+            price: 100,
+            qty: 10,
+            image: [{
+                url: 'img url',
+                id: 'img id'
+            }],
+            shopseller: shop,
+            preparedays: 10,
+            favorite: [{
+                customerid: user,
+                favdate: new Date('2017-08-21')
+            }],
+            historylog: [{
+                customerid: user,
+                hisdate: new Date('2017-08-21')
+            }]
+        });
         // Save a user to the test db and create new Shop
         user.save(function() {
             shop = {
@@ -61,6 +83,10 @@ describe('Shop CRUD tests', function() {
                 },
                 image: [{
                     url: 'testurl'
+                }],
+                historylog: [{
+                    customerid: user,
+                    hisdate: new Date('2017-08-21')
                 }],
                 user: user
             };
@@ -225,13 +251,38 @@ describe('Shop CRUD tests', function() {
     it('should be able to get a single Shop if not signed in', function(done) {
         // Create new Shop model instance
         var shopObj = new Shop(shop);
+        var productObj = new Product({
+            name: 'Product name',
+            detail: 'Product detail',
+            price: 100,
+            qty: 10,
+            image: [{
+                url: 'img url',
+                id: 'img id'
+            }],
+            shopseller: shopObj,
+            preparedays: 10,
+            favorite: [{
+                customerid: user,
+                favdate: new Date('2017-08-21')
+            }],
+            historylog: [{
+                customerid: user,
+                hisdate: new Date('2017-08-21')
+            }]
+        });
+
+        productObj.save();
 
         // Save the Shop
         shopObj.save(function() {
             request(app).get('/api/shops/' + shopObj._id)
                 .end(function(req, res) {
                     // Set assertion
+                    // (res.body.shop).should.equal(shop);
+
                     res.body.should.be.instanceof(Object).and.have.property('name', shop.name);
+                    // res.body.shop.should.be.instanceof(Object).and.have.property('name', shop.name);
 
                     // Call the assertion callback
                     done();

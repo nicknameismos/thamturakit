@@ -64,17 +64,17 @@ var ProductSchema = new Schema({
         type: Schema.ObjectId,
         ref: 'Shop'
     },
-    // shippings: {
-    //     required: 'Please fill Product shippings',
-    //     type: [{
-    //         shipping: {
-    //             type: Schema.ObjectId,
-    //             ref: 'Shipping'
-    //         },
-    //         shippingstartdate: Date,
-    //         shippingenddate: Date
-    //     }]
-    // },
+    shippings: {
+        required: 'Please fill Product shippings',
+        type: [{
+            shipping: {
+                type: Schema.ObjectId,
+                ref: 'Shipping'
+            },
+            shippingstartdate: Date,
+            shippingenddate: Date
+        }]
+    },
     issize: {
         type: Boolean
     },
