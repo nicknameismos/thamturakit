@@ -4,61 +4,65 @@
  * Module dependencies.
  */
 var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
+  Schema = mongoose.Schema;
 
 /**
  * Shop Schema
  */
 var ShopSchema = new Schema({
-    name: {
-        type: String,
-        default: '',
-        required: 'Please fill Shop name',
-        trim: true
+  name: {
+    type: String,
+    default: '',
+    required: 'Please fill Shop name',
+    trim: true
+  },
+  detail: {
+    type: String,
+    default: ''
+  },
+  email: {
+    type: String,
+    default: ''
+  },
+  image: {
+    type: String,
+    default: ''
+  },
+  tel: {
+    type: String,
+    default: ''
+  },
+  map: {
+    lat: {
+      type: String
     },
-    detail: {
-        type: String,
-        trim: true
-    },
-    email: {
-        type: String
-    },
-    tel: {
-        type: String
-    },
-    image: {
-        type: [{
-            url: String
-        }]
-    },
-    map: {
-        lat: {
-            type: String
-        },
-        lng: {
-            type: String
-        }
-    },
-    historylog: {
-        type: [{
-            customerid: {
-                type: Schema.ObjectId,
-                ref: 'User'
-            },
-            hisdate: {
-                type: Date,
-                default: Date.now
-            }
-        }]
-    },
-    created: {
+    long: {
+      type: String
+    }
+  },
+  reviews: {
+    type: [{
+      topic: String,
+      comment: String,
+      rate: Number,
+      created: {
         type: Date,
         default: Date.now
-    },
-    user: {
+      },
+      user: {
         type: Schema.ObjectId,
         ref: 'User'
-    }
+      }
+    }]
+  },
+  created: {
+    type: Date,
+    default: Date.now
+  },
+  user: {
+    type: Schema.ObjectId,
+    ref: 'User'
+  }
 });
 
 mongoose.model('Shop', ShopSchema);

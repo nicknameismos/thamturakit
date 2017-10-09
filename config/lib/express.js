@@ -17,7 +17,14 @@ var config = require('../config'),
   helmet = require('helmet'),
   flash = require('connect-flash'),
   consolidate = require('consolidate'),
+  cors = require('cors'),
   path = require('path');
+
+
+
+
+
+
 
 /**
  * Initialize local variables
@@ -44,6 +51,19 @@ module.exports.initLocalVariables = function (app) {
     res.locals.url = req.protocol + '://' + req.headers.host + req.originalUrl;
     next();
   });
+
+  app.use(function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+  });
+
+  var corsOptions = {
+    origin: '*'
+  };
+
+  app.use(cors(corsOptions));
 };
 
 /**

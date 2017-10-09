@@ -97,6 +97,16 @@ var UserSchema = new Schema({
   },
   resetPasswordExpires: {
     type: Date
+  },
+  /* For user login */
+  loginToken: {
+    type: String
+  },
+  loginExpires: {
+    type: Date
+  },
+  tel: {
+    type: String
   }
 });
 

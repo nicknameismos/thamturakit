@@ -4,92 +4,113 @@
  * Module dependencies.
  */
 var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
+  Schema = mongoose.Schema;
 
 /**
  * Product Schema
+ * id: string;
+    name: string;
+    detail: string;
+    unitprice: number;
+    image: Array<ImgsModel>;
+    review: Array<ReviewsModel>;
+    rate: number;
+    qa: Array<QASModel>;
+    promotions: Array<PromotionsModel>;
+    qty: number;
+    issize: boolean;
+    size: ProductDataSize = new ProductDataSize();
+    shipping: Array<ShippingModel>;
+    shop: ShopModel = new ShopModel();
+    relationProducts: Array<RelationProductsModel>;
+    selectedsize: string;
+    title: string;
  */
+
 var ProductSchema = new Schema({
-    name: {
-        type: String,
-        required: 'Please fill Product name'
-    },
-    detail: {
-        type: String
-    },
-    price: {
-        type: Number,
-        required: 'Please fill Product price',
-    },
-    qty: {
-        type: Number
-    },
-    image: {
-        required: 'Please fill Product image',
-        type: [{
-            url: String,
-            id: String
-        }]
-    },
-    preparedays: {
-        type: Number,
-        required: 'Please fill Product preparedays',
-    },
-    favorite: {
-        type: [{
-            customerid: {
-                type: Schema.ObjectId,
-                ref: 'User'
-            },
-            favdate: {
-                type: Date,
-                default: Date.now
-            }
-        }]
-    },
-    historylog: {
-        type: [{
-            customerid: {
-                type: Schema.ObjectId,
-                ref: 'User'
-            },
-            hisdate: {
-                type: Date,
-                default: Date.now
-            }
-        }]
-    },
-    shopseller: {
-        required: 'Please fill Product shopseller',
-        type: Schema.ObjectId,
-        ref: 'Shop'
-    },
-    shippings: {
-        required: 'Please fill Product shippings',
-        type: [{
-            shipping: {
-                type: Schema.ObjectId,
-                ref: 'Shipping'
-            },
-            shippingstartdate: Date,
-            shippingenddate: Date
-        }]
-    },
-    issize: {
-        type: Boolean
-    },
-    // size: {
-    //     type: Schema.ObjectId,
-    //     ref: 'Sizemaster'
-    // },
-    created: {
+  name: {
+    type: String,
+    default: '',
+    required: 'Please fill Product name',
+    trim: true
+  },
+  detail: String,
+  price: {
+    type: Number,
+    required: 'Please fill Product price'
+  },
+  promotionprice: {
+    type: Number
+  },
+  percentofdiscount: {
+    type: Number
+  },
+  currency: {
+    type: String
+  },
+  images: {
+    type: [String],
+    required: 'Please fill Product images'
+  },
+  reviews: {
+    type: [{
+      topic: String,
+      comment: String,
+      rate: Number,
+      created: {
         type: Date,
         default: Date.now
-    },
-    user: {
+      },
+      user: {
         type: Schema.ObjectId,
         ref: 'User'
-    }
+      }
+    }]
+  },
+  shippings: {
+    type: [{
+      type: Schema.ObjectId,
+      ref: 'Shipping'
+    }],
+    required: 'Please fill Product Shipping'
+  },
+  categories: {
+    type: [{
+      type: Schema.ObjectId,
+      ref: 'Category'
+    }]
+  },
+  cod: {
+    type: Boolean,
+    default: false
+  },
+  rate: {
+    type: Number
+  },
+  shop: {
+    type: Schema.ObjectId,
+    ref: 'Shop'
+  },
+  historylog: {
+    type: [{
+      user: {
+        type: Schema.ObjectId,
+        ref: 'User'
+      },
+      created: {
+        type: Date,
+        default: Date.now
+      }
+    }]
+  },
+  created: {
+    type: Date,
+    default: Date.now
+  },
+  user: {
+    type: Schema.ObjectId,
+    ref: 'User'
+  }
 });
 
 mongoose.model('Product', ProductSchema);

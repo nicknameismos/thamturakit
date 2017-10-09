@@ -4,29 +4,55 @@
  * Module dependencies.
  */
 var passport = require('passport'),
-  LocalStrategy = require('passport-local').Strategy,
-  User = require('mongoose').model('User');
+    LocalStrategy = require('passport-local').Strategy,
+    User = require('mongoose').model('User'),
+    jwt = require('jsonwebtoken');
 
-module.exports = function () {
-  // Use local strategy
-  passport.use(new LocalStrategy({
-    usernameField: 'username',
-    passwordField: 'password'
-  },
-  function (username, password, done) {
-    User.findOne({
-      username: username.toLowerCase()
-    }, function (err, user) {
-      if (err) {
-        return done(err);
-      }
-      if (!user || !user.authenticate(password)) {
-        return done(null, false, {
-          message: 'Invalid username or password'
-        });
-      }
+var secret = 'keepitquiet';
 
-      return done(null, user);
-    });
-  }));
+module.exports = function() {
+    // Use local strategy
+    passport.use('local', new LocalStrategy({
+            usernameField: 'username',
+            passwordField: 'password'
+        },
+        function(username, password, done) {
+            User.findOne({
+                username: username
+            }, function(err, user) {
+                if (err) {
+                    return done(err);
+                }
+                if (!user) {
+                    return done(null, false, {
+                        message: 'Unknown user'
+                    });
+                }
+                if (!user.authenticate(password)) {
+                    return done(null, false, {
+                        message: 'Invalid password'
+                    });
+                }
+
+                var tokenPayload = {
+                    username: user.username,
+                    loginExpires: user.loginExpires
+                };
+
+                // add token and exp date to user object
+                user.loginToken = jwt.sign(tokenPayload, secret);
+                user.loginExpires = Date.now() + (2 * 60 * 60 * 1000); // 2 hours
+
+                // save user object to update database
+                user.save(function(err) {
+                    if(err){
+                        done(err);
+                    } else {
+                        done(null, user);
+                    }
+                });
+
+            });
+        }
+    ));
 };
