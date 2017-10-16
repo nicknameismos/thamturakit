@@ -44,6 +44,7 @@ exports.read = function (req, res) {
     });
   }
   var shop = {
+    _id: productDB.shop ? productDB.shop._id : '',
     name: productDB.shop ? productDB.shop.name : '',
     rate: productDB.shop ? productDB.shop.rate : null
   };
@@ -68,11 +69,12 @@ exports.read = function (req, res) {
     currency: productDB.currency,
     images: productDB.images,
     rate: productDB.rate ? productDB.rate : 5,
-    // favorites: productDB.favorites,
     reviews: productDB.reviews,
     shippings: shippings,
     shop: shop,
-    // isfavorite: isfavorite,
+    // shippings: req.product.shippings,
+    // shop: req.product.shop,
+    categories: req.product.categories,
     otherproducts: []
   };
   // Add a custom field to the Article, for determining if the current User is the "owner".
@@ -183,7 +185,7 @@ exports.productByID = function (req, res, next, id) {
     });
   }
 
-  Product.findById(id).populate('user', 'displayName').populate('shop').populate('shippings').exec(function (err, product) {
+  Product.findById(id).populate('user', 'displayName').populate('categories').populate('shop').populate('shippings').exec(function (err, product) {
     if (err) {
       return next(err);
     } else if (!product) {

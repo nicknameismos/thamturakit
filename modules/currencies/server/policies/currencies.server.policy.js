@@ -9,56 +9,47 @@ var acl = require('acl');
 acl = new acl(new acl.memoryBackend());
 
 /**
- * Invoke Homes Permissions
+ * Invoke Currencies Permissions
  */
 exports.invokeRolesPolicies = function () {
   acl.allow([{
     roles: ['admin'],
     allows: [{
-      resources: '/api/homes',
+      resources: '/api/currencies',
       permissions: '*'
-    },{
-      resources: '/api/seeallproduct/:catename',
-      permissions: ['get']
-    },{
-      resources: '/api/seeallshop/:catename',
-      permissions: ['get']
+    }, {
+      resources: '/api/currencies/:currencyId',
+      permissions: '*'
     }]
   }, {
     roles: ['user'],
     allows: [{
-      resources: '/api/homes',
-      permissions: ['get']
-    },{
-      resources: '/api/seeallproduct/:catename',
-      permissions: ['get']
-    },{
-      resources: '/api/seeallshop/:catename',
+      resources: '/api/currencies',
+      permissions: ['get', 'post']
+    }, {
+      resources: '/api/currencies/:currencyId',
       permissions: ['get']
     }]
   }, {
     roles: ['guest'],
     allows: [{
-      resources: '/api/homes',
+      resources: '/api/currencies',
       permissions: ['get']
-    },{
-      resources: '/api/seeallproduct/:catename',
-      permissions: ['get']
-    },{
-      resources: '/api/seeallshop/:catename',
+    }, {
+      resources: '/api/currencies/:currencyId',
       permissions: ['get']
     }]
   }]);
 };
 
 /**
- * Check If Homes Policy Allows
+ * Check If Currencies Policy Allows
  */
 exports.isAllowed = function (req, res, next) {
   var roles = (req.user) ? req.user.roles : ['guest'];
 
-  // If an Home is being processed and the current user created it then allow any manipulation
-  if (req.home && req.user && req.home.user && req.home.user.id === req.user.id) {
+  // If an Currency is being processed and the current user created it then allow any manipulation
+  if (req.currency && req.user && req.currency.user && req.currency.user.id === req.user.id) {
     return next();
   }
 

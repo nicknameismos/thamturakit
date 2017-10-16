@@ -9,6 +9,8 @@ var path = require('path'),
   Shop = mongoose.model('Shop'),
   Cart = mongoose.model('Cart'),
   Address = mongoose.model('Address'),
+  Product = mongoose.model('Product'),
+  User = mongoose.model('User'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
   _ = require('lodash'),
   request = require('request'),
@@ -27,12 +29,25 @@ exports.create = function (req, res, next) {
         message: errorHandler.getErrorMessage(err)
       });
     } else {
-      var sellerMessage = 'คุณมีรายการสั่งซื้อใหม่';
-      var buyerMessage = 'ขอขอบคุณที่ใช้บริการ';
-      sentNotiToSeller(sellerMessage);
-      sentNotiToBuyer(buyerMessage);
-      req.resOrder = order;
-      next();
+      Product.populate(order, {
+        path: 'items.product'
+      }, function (err, orderRes) {
+        User.populate(orderRes, {
+          path: 'items.product.user'
+        }, function (err, orderRes2) {
+          var sellerMessage = 'คุณมีรายการสั่งซื้อใหม่';
+          var buyerMessage = 'ขอขอบคุณที่ใช้บริการ';
+          for (var i = 0; i < orderRes2.items.length; i++) {
+            var ids = orderRes2.items[i].product ? orderRes2.items[i].product.user ? orderRes2.items[i].product.user.pushnotifications ? orderRes2.items[i].product.user.pushnotifications : [] : [] : [];
+            if (ids.length > 0) {
+              sentNotiToSeller(sellerMessage, ids);
+            }
+          }
+          sentNotiToBuyer(buyerMessage, req.user.pushnotifications);
+          req.resOrder = orderRes2;
+          next();
+        });
+      });
     }
   });
 };
@@ -160,7 +175,7 @@ exports.orderByID = function (req, res, next, id) {
     });
   }
 
-  Order.findById(id).populate('user', 'displayName').populate('items.product').exec(function (err, order) {
+  Order.findById(id).populate('user').populate('items.product').exec(function (err, order) {
     if (err) {
       return next(err);
     } else if (!order) {
@@ -246,24 +261,9 @@ exports.sendNotiSeller = function (req, res) {
   });
 };
 
-exports.getShopByUser = function (req, res, next) {
-  Shop.find({
-    user: req.user._id
-  }).exec(function (err, shops) {
-    if (err) {
-      return res.status(400).send({
-        message: errorHandler.getErrorMessage(err)
-      });
-    } else {
-      if (shops && shops.length > 0) {
-        req.shop = shops[0];
-        next();
-      } else {
-        next();
-      }
-
-    }
-  });
+exports.getShopByUser = function (req, res, next, shopId) {
+  req.shopId = shopId;
+  next();
 };
 
 exports.getOrderList = function (req, res, next) {
@@ -290,24 +290,28 @@ exports.cookingOrderByShop = function (req, res, next) {
     sent: [],
     return: []
   };
-  if (req.orders && req.orders.length > 0) {
+  if (req.orders && req.orders.length > 0 && req.shopId) {
     req.orders.forEach(function (order) {
       if (order.items && order.items.length > 0) {
         order.items.forEach(function (itm) {
-          var shop = itm.product ? itm.product.shop ? itm.product.shop.toString() === req.shop._id.toString() : false : false;
+          var shop = itm.product ? itm.product.shop ? itm.product.shop.toString() === req.shopId.toString() : false : false;
           if (shop) {
+            var price = itm.totalamount && itm.totalamount > 0 ? itm.totalamount : (itm.amount || 0) - (itm.discount || 0);
             if (itm.status === 'waiting') {
               data.waiting.push({
                 order_id: order._id,
                 item_id: itm._id,
                 name: itm.product.name,
-                price: itm.totalamount && itm.totalamount > 0 ? itm.totalamount : (itm.amount || 0) - (itm.discount || 0),
+                price: price,
                 qty: itm.qty,
                 rate: itm.product.rate || 0,
                 image: itm.product.images[0] || 'No image',
                 status: itm.status,
                 shipping: order.shipping,
-                delivery: itm.delivery
+                delivery: itm.delivery,
+                promotionprice: price - itm.discount,
+                currency: itm.product.currency,
+                percentofdiscount: itm.product.percentofdiscount
               });
             } else if (itm.status === 'accept') {
               data.accept.push({
@@ -320,7 +324,10 @@ exports.cookingOrderByShop = function (req, res, next) {
                 image: itm.product.images[0] || 'No image',
                 status: itm.status,
                 shipping: order.shipping,
-                delivery: itm.delivery
+                delivery: itm.delivery,
+                promotionprice: price - itm.discount,
+                currency: itm.product.currency,
+                percentofdiscount: itm.product.percentofdiscount
               });
             } else if (itm.status === 'sent') {
               data.sent.push({
@@ -333,7 +340,10 @@ exports.cookingOrderByShop = function (req, res, next) {
                 image: itm.product.images[0] || 'No image',
                 status: itm.status,
                 shipping: order.shipping,
-                delivery: itm.delivery
+                delivery: itm.delivery,
+                promotionprice: price - itm.discount,
+                currency: itm.product.currency,
+                percentofdiscount: itm.product.percentofdiscount
               });
             } else if (itm.status === 'return') {
               data.return.push({
@@ -346,7 +356,10 @@ exports.cookingOrderByShop = function (req, res, next) {
                 image: itm.product.images[0] || 'No image',
                 status: itm.status,
                 shipping: order.shipping,
-                delivery: itm.delivery
+                delivery: itm.delivery,
+                promotionprice: price - itm.discount,
+                currency: itm.product.currency,
+                percentofdiscount: itm.product.percentofdiscount
               });
             }
           }
@@ -382,7 +395,8 @@ exports.waitingToAccept = function (req, res) {
       });
     } else {
       var buyerMessage = productname + ' ได้รับการยืนยันแล้ว กำลังเตรียมการจัดส่ง'; // คนซื้อ
-      sentNotiToBuyer(buyerMessage);
+      var pushnotifications = req.order.user ? req.order.user.pushnotifications ? req.order.user.pushnotifications : [] : [];
+      sentNotiToBuyer(buyerMessage, pushnotifications);
       res.jsonp(req.order);
     }
   });
@@ -403,7 +417,8 @@ exports.acceptToSent = function (req, res) {
       });
     } else {
       var buyerMessage = productname + ' จัดส่งแล้ว หมายเลขพัสดุ: 123456789'; // คนซื้อ
-      sentNotiToBuyer(buyerMessage);
+      var pushnotifications = req.order.user ? req.order.user.pushnotifications ? req.order.user.pushnotifications : [] : [];
+      sentNotiToBuyer(buyerMessage, pushnotifications);
       res.jsonp(req.order);
     }
   });
@@ -424,7 +439,8 @@ exports.sentToComplete = function (req, res) {
       });
     } else {
       var buyerMessage = productname + ' ดำเนินการเสร็จสิ้น ขอบคุณที่ใช้บริการ'; // คนซื้อ
-      sentNotiToBuyer(buyerMessage);
+      var pushnotifications = req.order.user ? req.order.user.pushnotifications ? req.order.user.pushnotifications : [] : [];
+      sentNotiToBuyer(buyerMessage, pushnotifications);
       res.jsonp(req.order);
     }
   });
@@ -446,13 +462,14 @@ exports.waitingToReject = function (req, res) {
       });
     } else {
       var buyerMessage = productname + ' ถูกยกเลิกคำสั่งซื้อ ขออภัยในความไม่สะดวก'; // คนซื้อ
-      sentNotiToBuyer(buyerMessage);
+      var pushnotifications = req.order.user ? req.order.user.pushnotifications ? req.order.user.pushnotifications : [] : [];
+      sentNotiToBuyer(buyerMessage, pushnotifications);
       res.jsonp(req.order);
     }
   });
 };
 
-function sentNotiToSeller(message) {
+function sentNotiToSeller(message, ids) {
   request({
     url: pushNotiUrl,
     headers: {
@@ -464,7 +481,7 @@ function sentNotiToSeller(message) {
       contents: {
         en: message
       },
-      included_segments: ['All']
+      include_player_ids: ids
     }
   }, function (error, response, body) {
     if (error) {
@@ -479,31 +496,37 @@ function sentNotiToSeller(message) {
   });
 }
 
-function sentNotiToBuyer(message) {
-  request({
-    url: pushNotiUrl,
-    headers: {
-      'Authorization': 'Basic ZWNkZWY0MmUtNGJiNC00ZThjLWIyOWUtNzdmNzAxZmMyZDMw'
-    },
-    method: 'POST',
-    json: {
-      app_id: 'd5d9533c-3ac8-42e6-bc16-a5984bef02ff',
-      contents: {
-        en: message
+function sentNotiToBuyer(message, ids) {
+  if (ids && ids.length > 0) {
+    request({
+      url: pushNotiUrl,
+      headers: {
+        'Authorization': 'Basic ZWNkZWY0MmUtNGJiNC00ZThjLWIyOWUtNzdmNzAxZmMyZDMw'
       },
-      included_segments: ['All']
-    }
-  }, function (error, response, body) {
-    if (error) {
-      console.log('Error sending messages: ', error);
-      // res.jsonp({ message: error });
+      method: 'POST',
+      json: {
+        app_id: 'd5d9533c-3ac8-42e6-bc16-a5984bef02ff',
+        contents: {
+          en: message
+        },
+        include_player_ids: ids
+      }
+    }, function (error, response, body) {
+      if (error) {
+        console.log('Error sending messages: ', error);
+        // res.jsonp({ message: error });
 
-    } else if (response.body.error) {
-      console.log('Error: ', response.body.error);
-      // res.jsonp({ message: response.body.error });
-    }
-    console.log({
-      message: 'sent noti success'
+      } else if (response.body.error) {
+        console.log('Error: ', response.body.error);
+        // res.jsonp({ message: response.body.error });
+      }
+      console.log({
+        message: 'sent noti success'
+      });
     });
-  });
+  } else {
+    console.log({
+      message: 'User ids not found.'
+    });
+  }
 }
