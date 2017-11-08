@@ -47,7 +47,7 @@ exports.signup = function (req, res, next) {
           // Remove sensitive data before login
           user.password = undefined;
           user.salt = undefined;
-    
+
           req.login(user, function (err) {
             if (err) {
               res.status(400).send(err);
@@ -263,3 +263,45 @@ exports.removeOAuthProvider = function (req, res, next) {
     }
   });
 };
+
+// exports.telsignin = function (req, res, next) {
+//   User.find(req.body).exec(function (err, users) {
+//     if (err) {
+//       return res.status(400).send({
+//         message: errorHandler.getErrorMessage(err)
+//       });
+//     }
+//     // res.jsonp(users[0]);
+//     if (users && users.length > 0) {
+//       User.findById(users[0]._id).exec(function (err, userres) {
+//         if (err) {
+//           return res.status(400).send({
+//             message: errorHandler.getErrorMessage(err)
+//           });
+//         }
+//         req.user = userres;
+//         passport.authenticate('tel', function (err, user, info) {
+//           if (err || !user) {
+//             res.status(400).send(info);
+//           } else {
+//             // Remove sensitive data before login
+//             user.password = undefined;
+//             user.salt = undefined;
+
+//             req.login(user, function (err) {
+//               if (err) {
+//                 res.status(400).send(err);
+//               } else {
+//                 res.json(user);
+//               }
+//             });
+//           }
+//         })(req, res, next);
+//       });
+//     } else {
+//       return res.status(400).send({
+//         message: 'not user'
+//       });
+//     }
+//   });
+// };
