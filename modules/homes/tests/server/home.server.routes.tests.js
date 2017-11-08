@@ -95,6 +95,10 @@ describe('home', function () {
       categories: [category],
       cod: false,
       shop: shop,
+      historylog: [{
+        user: user,
+        created: new Date()
+      }]
     });
 
     address = new Address({
@@ -163,7 +167,7 @@ describe('home', function () {
 
   it('home', function (done) {
     var product1 = new Product({
-      name: 'Product name',
+      name: 'Product name1',
       detail: 'Product detail',
       price: 100,
       promotionprice: 80,
@@ -192,7 +196,7 @@ describe('home', function () {
       shop: shop,
     });
     var product2 = new Product({
-      name: 'Product name',
+      name: 'Product name2',
       detail: 'Product detail',
       price: 100,
       promotionprice: 80,
@@ -218,7 +222,7 @@ describe('home', function () {
       }]
     });
     var product3 = new Product({
-      name: 'Product name',
+      name: 'Product name3',
       detail: 'Product detail',
       price: 100,
       promotionprice: 80,
@@ -333,7 +337,7 @@ describe('home', function () {
 
         // Set assertions
         (home.categories.length).should.match(3);
-        (home.categories[0].name).should.match('highlight');
+        (home.categories[0].name).should.match('Highlight');
         (home.categories[0].popularproducts.length).should.match(5);
         (home.categories[0].popularshops.length).should.match(1);
         (home.categories[0].popularshops[0].name).should.match(shop.name);
@@ -351,7 +355,7 @@ describe('home', function () {
 
   it('see all product highlight cate', function (done) {
     var product1 = new Product({
-      name: 'Product name',
+      name: 'Product name1',
       detail: 'Product detail',
       price: 100,
       promotionprice: 80,
@@ -380,7 +384,7 @@ describe('home', function () {
       shop: shop,
     });
     var product2 = new Product({
-      name: 'Product name',
+      name: 'Product name2',
       detail: 'Product detail',
       price: 100,
       promotionprice: 80,
@@ -406,7 +410,7 @@ describe('home', function () {
       }]
     });
     var product3 = new Product({
-      name: 'Product name',
+      name: 'Product name3',
       detail: 'Product detail',
       price: 100,
       promotionprice: 80,
@@ -510,7 +514,7 @@ describe('home', function () {
       name: 'mos'
     });
     cate.save();
-    agent.get('/api/seeallproduct/highlight')
+    agent.get('/api/seeallproduct/Highlight')
       .end(function (homeGetErr, homeGetRes) {
         // Handle Home save error
         if (homeGetErr) {
@@ -519,7 +523,7 @@ describe('home', function () {
         // Get Home list
         var home = homeGetRes.body;
 
-        (home.title).should.match('highlight');
+        (home.title).should.match('Highlight');
         (home.items.length).should.match(5);
         done();
       });
@@ -634,7 +638,7 @@ describe('home', function () {
       name: 'mos'
     });
     cate.save();
-    agent.get('/api/seeallshop/highlight')
+    agent.get('/api/seeallshop/Highlight')
       .end(function (homeGetErr, homeGetRes) {
         // Handle Home save error
         if (homeGetErr) {
@@ -643,7 +647,7 @@ describe('home', function () {
         // Get Home list
         var home = homeGetRes.body;
 
-        (home.title).should.match('highlight');
+        (home.title).should.match('Highlight');
         (home.items.length).should.match(1);
         done();
       });
