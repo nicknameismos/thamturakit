@@ -7,6 +7,7 @@ var path = require('path'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
   mongoose = require('mongoose'),
   passport = require('passport'),
+  Address = mongoose.model('Address'),
   User = mongoose.model('User');
 
 // URLs for which user can't be redirected on signin
@@ -264,44 +265,75 @@ exports.removeOAuthProvider = function (req, res, next) {
   });
 };
 
-// exports.telsignin = function (req, res, next) {
-//   User.find(req.body).exec(function (err, users) {
-//     if (err) {
-//       return res.status(400).send({
-//         message: errorHandler.getErrorMessage(err)
-//       });
-//     }
-//     // res.jsonp(users[0]);
-//     if (users && users.length > 0) {
-//       User.findById(users[0]._id).exec(function (err, userres) {
-//         if (err) {
-//           return res.status(400).send({
-//             message: errorHandler.getErrorMessage(err)
-//           });
-//         }
-//         req.user = userres;
-//         passport.authenticate('tel', function (err, user, info) {
-//           if (err || !user) {
-//             res.status(400).send(info);
-//           } else {
-//             // Remove sensitive data before login
-//             user.password = undefined;
-//             user.salt = undefined;
+exports.checkuserByTel = function (req, res) {
+  User.find(req.body).exec(function (err, users) {
+    if (err) {
+      return res.status(400).send({
+        message: errorHandler.getErrorMessage(err)
+      });
+    }
+    // res.jsonp(users[0]);
+    if (users && users.length > 0) {
+      res.jsonp(true);
+    } else {
+      res.jsonp(false);
+    }
+  });
+};
 
-//             req.login(user, function (err) {
-//               if (err) {
-//                 res.status(400).send(err);
-//               } else {
-//                 res.json(user);
-//               }
-//             });
-//           }
-//         })(req, res, next);
-//       });
-//     } else {
-//       return res.status(400).send({
-//         message: 'not user'
-//       });
-//     }
-//   });
-// };
+exports.signupByTel = function (req, res, next) {
+  delete req.body.roles;
+  var userdata = req.body;
+  userdata.displayName = userdata.firstName + ' ' + userdata.lastName;
+  userdata.username = userdata.tel;
+  userdata.password = 'Usr#Pass1234';
+  userdata.email = userdata.tel + '@thamturakit.com';
+  userdata.provider = 'local';
+  var user = new User(userdata);
+  var data = new User(user);
+
+  data.displayName = user.displayName;
+  // data.username = user.username;
+  // data.password = user.password;
+  data.email = user.email;
+  data.provider = user.provider;
+  var message = null;
+  // Then save the user
+  data.save(function (err) {
+    if (err) {
+      return res.status(400).send({
+        message: errorHandler.getErrorMessage(err)
+      });
+    } else {
+      passport.authenticate('local', function (err, user, info) {
+        if (err || !user) {
+          res.status(400).send(info);
+        } else {
+          // Remove sensitive data before login
+          user.password = undefined;
+          user.salt = undefined;
+
+          req.login(user, function (err) {
+            if (err) {
+              res.status(400).send(err);
+            } else {
+              // req.resuser = user;
+              var address = new Address(req.body);
+              address.firstname = user.firstName;
+              address.lastname = user.lastName;
+              address.save(function (err) {
+                if (err) {
+                  return res.status(400).send({
+                    message: errorHandler.getErrorMessage(err)
+                  });
+                }
+                res.jsonp(user);
+              });
+              // next();
+            }
+          });
+        }
+      })(req, res, next);
+    }
+  });
+};

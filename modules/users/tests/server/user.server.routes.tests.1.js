@@ -5,6 +5,7 @@ var should = require('should'),
   path = require('path'),
   mongoose = require('mongoose'),
   User = mongoose.model('User'),
+  Address = mongoose.model('Address'),
   express = require(path.resolve('./config/lib/express'));
 
 /**
@@ -89,22 +90,22 @@ describe('User Update Pushnotification have Token', function () {
       });
   });
 
-  // it('login with tel', function (done) {
-  //   var data = { tel: '22222' };
-  //   agent.post('/api/auth/telsignin')
-  //     .send(data)
-  //     .expect(200)
-  //     .end(function (notiErr, notiRes) {
-  //       // Handle signin error
-  //       if (notiErr) {
-  //         return done(notiErr);
-  //       }
-  //       var userss = notiRes.body;
-  //       (userss.tel).should.match('22222');
+  it('checkuser with tel', function (done) {
+    var data = { tel: '22223' };
+    agent.post('/api/auth/checkuserbytel')
+      .send(data)
+      .expect(200)
+      .end(function (notiErr, notiRes) {
+        // Handle signin error
+        if (notiErr) {
+          return done(notiErr);
+        }
+        var userss = notiRes.body;
+        (userss).should.match(false);
 
-  //       done();
-  //     });
-  // });
+        done();
+      });
+  });
 
   afterEach(function (done) {
     User.remove().exec(done);
