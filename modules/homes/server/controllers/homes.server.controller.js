@@ -616,3 +616,7 @@ exports.homeSeller = function (req, res) {
     report: req.reports
   });
 };
+
+exports.tokenRes = function (req, res) {
+  res.jsonp(req.user);
+};

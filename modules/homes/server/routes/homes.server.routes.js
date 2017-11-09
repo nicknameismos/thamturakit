@@ -25,7 +25,8 @@ module.exports = function (app) {
 
   app.route('/api/homeseller/:sellerShopId').all(core.requiresLoginToken, homesPolicy.isAllowed)
     .get(homes.orderToday, homes.orderMonth, homes.orderYear, homes.bestCateOfYear, homes.reportFirstMonth, homes.reportSecondMonth, homes.reportThirdMonth, homes.reportFourthMonth, homes.homeSeller);
-
+  app.route('/api/checkexpireuser').all(core.requiresLoginToken)
+    .get(homes.tokenRes);
   // Finish by binding the Home middleware
   app.param('catename', homes.cateName);
   app.param('sellerShopId', homes.sellerShopId);

@@ -206,8 +206,8 @@ describe('home seller', function () {
     orderObj2.items[0].status = 'complete';
     orderObj2.items[1].status = 'complete';
     var orderObj3 = new Order(order);
-    orderObj3.created = new Date('2017','9','22');
-    
+    orderObj3.created = new Date('2017', '9', '22');
+
     orderObj2.status = 'confirm';
     orderObj1.save();
     orderObj2.save();
@@ -236,6 +236,52 @@ describe('home seller', function () {
       });
   });
 
+  it('check token expire not expire', function (done) {
+    agent.get('/api/checkexpireuser')
+      .set('authorization', 'Bearer ' + token)
+      .end(function (tokenGetErr, tokenGetRes) {
+        // Handle Home save error
+        if (tokenGetErr) {
+          return done(tokenGetErr);
+        }
+        // Get Home list
+        var home = tokenGetRes.body;
+        (home.firstName).should.match(user.firstName);
+        // Set assertions
+
+        done();
+      });
+  });
+
+  it('check token expire', function (done) {
+    var oldToken = token;
+    agent.post('/api/auth/signin')
+      .send(credentials)
+      .expect(200)
+      .end(function (signinErr, signinRes) {
+        // Handle signin error
+        if (signinErr) {
+          return done(signinErr);
+        }
+        signinRes.body.loginToken.should.not.be.empty();
+        token = signinRes.body.loginToken;
+        agent.get('/api/checkexpireuser')
+          .set('authorization', 'Bearer ' + oldToken)
+          .expect(401)
+          .end(function (tokenGetErr, tokenGetRes) {
+            // Handle Home save error
+            if (tokenGetErr) {
+              return done(tokenGetErr);
+            }
+            (tokenGetRes.body.message).should.match('Token is incorrect or has expired. Please login again');
+
+            // Handle Category error error
+
+            done(tokenGetErr);
+          });
+      });
+
+  });
 
 
   afterEach(function (done) {
