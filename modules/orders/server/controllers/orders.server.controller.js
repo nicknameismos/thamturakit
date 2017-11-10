@@ -109,9 +109,17 @@ exports.clearCart = function (req, res, next) {
 exports.read = function (req, res) {
   // convert mongoose document to JSON
   var order = req.order ? req.order.toJSON() : {};
-  if(order.status){
-
+  order.isTransfer = true;
+  if (order.payment ? order.payment.paymenttype === 'Bank Transfer' : false) {
+    if (order.status !== 'confirm') {
+      order.isTransfer = false;
+    } else if (order.status === 'confirm') {
+      if (order.imageslip !== 'no image') {
+        order.isTransfer = false;
+      }
+    }
   }
+
 
   // Add a custom field to the Article, for determining if the current User is the "owner".
   // NOTE: This field is NOT persisted to the database, since it doesn't exist in the Article model.
@@ -490,6 +498,18 @@ exports.orderByUser = function (req, res) {
     } else {
       res.jsonp(orders);
     }
+  });
+};
+
+exports.uploadSlip = function (req, res) {
+  req.order.imageslip = req.body.image;
+  req.order.save(function (err) {
+    if (err) {
+      return res.status(400).send({
+        message: errorHandler.getErrorMessage(err)
+      });
+    }
+    res.jsonp(req.order);
   });
 };
 

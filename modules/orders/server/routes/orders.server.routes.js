@@ -41,6 +41,9 @@ module.exports = function (app) {
   app.route('/api/orderbyuser/:orderUserId')
     .get(orders.orderByUser);
 
+  app.route('/api/sliporder/:orderId')
+    .put(orders.uploadSlip);
+
 
   // Finish by binding the Order middleware
   app.param('orderId', orders.orderByID);

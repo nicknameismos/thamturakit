@@ -80,10 +80,6 @@ var OrderSchema = new Schema({
   omiseresponse: {
 
   },
-  isTranfer: {
-    type: Boolean,
-    default: false
-  },
   imageslip: {
     type: String,
     default: 'no image'

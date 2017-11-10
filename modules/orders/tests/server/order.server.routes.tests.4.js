@@ -131,6 +131,14 @@ describe('Get Order By user', function () {
                     discount: 2000,
                     deliveryprice: 0,
                     totalamount: 18000,
+                    payment: {
+                      paymenttype: 'String',
+                      creditno: 'String',
+                      creditname: 'String',
+                      expdate: 'String',
+                      creditcvc: 'String',
+                      counterservice: 'String'
+                    },
                   }
                 ],
                 amount: 30000,
@@ -205,6 +213,7 @@ describe('Get Order By user', function () {
 
   it('get order by id isTranfer true', function (done) {
     var orderObj1 = new Order(order);
+    orderObj1.payment.paymenttype = 'Bank Transfer';
     orderObj1.user = user;
     orderObj1.save();
     agent.get('/api/orders/' + orderObj1.id)
@@ -214,8 +223,46 @@ describe('Get Order By user', function () {
           return done(orderErr);
         }
         var ord = orderRes.body;
-        (ord.isTranfer).should.match(true);
+        (ord.isTransfer).should.match(true);
         (ord.imageslip).should.match('no image');
+        done();
+      });
+  });
+
+  it('get order by id isTranfer false', function (done) {
+    var orderObj1 = new Order(order);
+    orderObj1.payment.paymenttype = 'Bank Transfer';
+    orderObj1.status = 'complete';
+    orderObj1.user = user;
+    orderObj1.save();
+    agent.get('/api/orders/' + orderObj1.id)
+      .end(function (orderErr, orderRes) {
+        // Handle signin error
+        if (orderErr) {
+          return done(orderErr);
+        }
+        var ord = orderRes.body;
+        (ord.isTransfer).should.match(false);
+        done();
+      });
+  });
+
+  it('get order by id isTranfer false', function (done) {
+    var orderObj1 = new Order(order);
+    orderObj1.status = 'complete';
+    orderObj1.user = user;
+    orderObj1.save();
+    var data = { image: 'img' };
+    agent.put('/api/sliporder/' + orderObj1.id)
+      .send(data)
+      .expect(200)
+      .end(function (orderErr, orderRes) {
+        // Handle signin error
+        if (orderErr) {
+          return done(orderErr);
+        }
+        var ord = orderRes.body;
+        (ord.imageslip).should.match('img');
         done();
       });
   });
