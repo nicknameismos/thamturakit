@@ -109,6 +109,9 @@ exports.clearCart = function (req, res, next) {
 exports.read = function (req, res) {
   // convert mongoose document to JSON
   var order = req.order ? req.order.toJSON() : {};
+  if(order.status){
+
+  }
 
   // Add a custom field to the Article, for determining if the current User is the "owner".
   // NOTE: This field is NOT persisted to the database, since it doesn't exist in the Article model.
@@ -469,6 +472,23 @@ exports.waitingToReject = function (req, res) {
       var pushnotifications = req.order.user ? req.order.user.pushnotifications ? req.order.user.pushnotifications : [] : [];
       sentNotiToBuyer(buyerMessage, pushnotifications);
       res.jsonp(req.order);
+    }
+  });
+};
+
+exports.orderUserId = function (req, res, next, orderUserId) {
+  req.orderUserId = orderUserId;
+  next();
+};
+
+exports.orderByUser = function (req, res) {
+  Order.find({ user: { _id: req.orderUserId } }).sort('-created').populate('user', 'displayName').exec(function (err, orders) {
+    if (err) {
+      return res.status(400).send({
+        message: errorHandler.getErrorMessage(err)
+      });
+    } else {
+      res.jsonp(orders);
     }
   });
 };

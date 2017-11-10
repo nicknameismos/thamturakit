@@ -321,6 +321,7 @@ exports.signupByTel = function (req, res, next) {
               var address = new Address(req.body);
               address.firstname = user.firstName;
               address.lastname = user.lastName;
+              address.user = user;
               address.save(function (err) {
                 if (err) {
                   return res.status(400).send({

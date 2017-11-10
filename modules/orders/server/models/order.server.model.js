@@ -77,8 +77,16 @@ var OrderSchema = new Schema({
     enum: ['confirm', 'paid', 'prepare', 'deliver', 'complete', 'cancel'],
     default: 'confirm'
   },
-  omiseresponse:{
+  omiseresponse: {
 
+  },
+  isTranfer: {
+    type: Boolean,
+    default: false
+  },
+  imageslip: {
+    type: String,
+    default: 'no image'
   },
   created: {
     type: Date,

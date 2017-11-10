@@ -38,9 +38,13 @@ module.exports = function (app) {
   app.route('/api/notiseller/:message')
     .get(orders.sendNotiSeller);
 
+  app.route('/api/orderbyuser/:orderUserId')
+    .get(orders.orderByUser);
+
 
   // Finish by binding the Order middleware
   app.param('orderId', orders.orderByID);
+  app.param('orderUserId', orders.orderUserId);
   app.param('message', orders.message);
   app.param('itemId', orders.itemID);
   app.param('orderShopId', orders.getShopByUser);

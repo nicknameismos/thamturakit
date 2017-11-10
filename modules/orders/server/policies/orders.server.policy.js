@@ -35,6 +35,9 @@ exports.invokeRolesPolicies = function () {
     }, {
       resources: '/api/updateorderreject/:orderId/:itemId',
       permissions: ['put']
+    },{
+      resources: '/api/orderbyuser/:orderUserId',
+      permissions: ['get']
     }]
   }, {
     roles: ['user'],
@@ -59,6 +62,9 @@ exports.invokeRolesPolicies = function () {
     }, {
       resources: '/api/updateorderreject/:orderId/:itemId',
       permissions: ['put']
+    },{
+      resources: '/api/orderbyuser/:orderUserId',
+      permissions: ['get']
     }]
   }, {
     roles: ['guest'],
