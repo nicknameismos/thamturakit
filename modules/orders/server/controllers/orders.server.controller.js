@@ -109,8 +109,8 @@ exports.clearCart = function (req, res, next) {
 exports.read = function (req, res) {
   // convert mongoose document to JSON
   var order = req.order ? req.order.toJSON() : {};
-  order.isTransfer = true;
   if (order.payment ? order.payment.paymenttype === 'Bank Transfer' : false) {
+    order.isTransfer = true;
     if (order.status !== 'confirm') {
       order.isTransfer = false;
     } else if (order.status === 'confirm') {
@@ -118,6 +118,8 @@ exports.read = function (req, res) {
         order.isTransfer = false;
       }
     }
+  } else {
+    order.isTransfer = false;
   }
 
 

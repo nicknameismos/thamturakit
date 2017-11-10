@@ -229,10 +229,29 @@ describe('Get Order By user', function () {
       });
   });
 
-  it('get order by id isTranfer false', function (done) {
+  it('get order by id isTranfer false 1', function (done) {
     var orderObj1 = new Order(order);
     orderObj1.payment.paymenttype = 'Bank Transfer';
     orderObj1.status = 'complete';
+    orderObj1.user = user;
+    orderObj1.save();
+    agent.get('/api/orders/' + orderObj1.id)
+      .end(function (orderErr, orderRes) {
+        // Handle signin error
+        if (orderErr) {
+          return done(orderErr);
+        }
+        var ord = orderRes.body;
+        (ord.isTransfer).should.match(false);
+        done();
+      });
+  });
+
+  it('get order by id isTranfer false 2', function (done) {
+    var orderObj1 = new Order(order);
+    orderObj1.payment.paymenttype = 'Bank Transfer';
+    orderObj1.imageslip = 'sdfa';
+    orderObj1.status = 'confirm';
     orderObj1.user = user;
     orderObj1.save();
     agent.get('/api/orders/' + orderObj1.id)
