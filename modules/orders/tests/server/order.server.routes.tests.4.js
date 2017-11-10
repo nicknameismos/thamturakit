@@ -247,7 +247,7 @@ describe('Get Order By user', function () {
       });
   });
 
-  it('get order by id isTranfer false', function (done) {
+  it('update order upload slip', function (done) {
     var orderObj1 = new Order(order);
     orderObj1.status = 'complete';
     orderObj1.user = user;
