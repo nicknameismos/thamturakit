@@ -215,11 +215,11 @@ exports.sendNotiBuyer = function (req, res) {
   request({
     url: pushNotiUrl,
     headers: {
-      'Authorization': 'Basic ZWNkZWY0MmUtNGJiNC00ZThjLWIyOWUtNzdmNzAxZmMyZDMw'
+      'Authorization': 'Basic Y2U2Njg0YzYtMjZmYi00YjMyLWE5NGEtMjIwZjQ4NzY1ZDc4'
     },
     method: 'POST',
     json: {
-      app_id: 'd5d9533c-3ac8-42e6-bc16-a5984bef02ff',
+      app_id: '4deb2817-a4ea-496c-867e-9eb26940f565',
       contents: {
         en: req.message
       },
@@ -249,11 +249,11 @@ exports.sendNotiSeller = function (req, res) {
   request({
     url: pushNotiUrl,
     headers: {
-      'Authorization': 'Basic ZWFkMjNkNDUtZDIyNy00MGU2LTg5ZjEtYmZlY2FkYjUxZDY2'
+      'Authorization': 'Basic YmY2MDJlMzMtNWNjZi00ODViLWI0NDgtNDM3YTcwNGI1YzBh'
     },
     method: 'POST',
     json: {
-      app_id: 'fdfae3dc-e634-47f4-b959-f04e60f4613b',
+      app_id: '4b62e07d-3f2d-46a0-96f1-542b2fb46bd4',
       contents: {
         en: req.message
       },
@@ -519,11 +519,11 @@ function sentNotiToSeller(message, ids) {
   request({
     url: pushNotiUrl,
     headers: {
-      'Authorization': 'Basic ZWFkMjNkNDUtZDIyNy00MGU2LTg5ZjEtYmZlY2FkYjUxZDY2'
+      'Authorization': 'Basic YmY2MDJlMzMtNWNjZi00ODViLWI0NDgtNDM3YTcwNGI1YzBh'
     },
     method: 'POST',
     json: {
-      app_id: 'fdfae3dc-e634-47f4-b959-f04e60f4613b',
+      app_id: '4b62e07d-3f2d-46a0-96f1-542b2fb46bd4',
       contents: {
         en: message
       },
@@ -547,11 +547,11 @@ function sentNotiToBuyer(message, ids) {
     request({
       url: pushNotiUrl,
       headers: {
-        'Authorization': 'Basic ZWNkZWY0MmUtNGJiNC00ZThjLWIyOWUtNzdmNzAxZmMyZDMw'
+        'Authorization': 'Basic Y2U2Njg0YzYtMjZmYi00YjMyLWE5NGEtMjIwZjQ4NzY1ZDc4'
       },
       method: 'POST',
       json: {
-        app_id: 'd5d9533c-3ac8-42e6-bc16-a5984bef02ff',
+        app_id: '4deb2817-a4ea-496c-867e-9eb26940f565',
         contents: {
           en: message
         },
