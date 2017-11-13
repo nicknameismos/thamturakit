@@ -511,7 +511,22 @@ exports.uploadSlip = function (req, res) {
         message: errorHandler.getErrorMessage(err)
       });
     }
-    res.jsonp(req.order);
+    User.populate(req.order, {
+      path: 'items.product.user'
+    }, function (err, orderRes2) {
+      Shop.populate(orderRes2, {
+        path: 'items.product.shop'
+      }, function (err, orderRes3) {
+        for (var i = 0; i < orderRes3.items.length; i++) {
+          var ids = orderRes3.items[i].product ? orderRes3.items[i].product.user ? orderRes3.items[i].product.user.pushnotifications ? orderRes3.items[i].product.user.pushnotifications : [] : [] : [];
+          if (ids.length > 0) {
+            var sellerMessage = 'ร้าน ' + orderRes3.items[i].product.shop.name + ' มีการอัพเดทสลีป';
+            sentNotiToSeller(sellerMessage, ids);
+          }
+        }
+        res.jsonp(req.order);
+      });
+    });
   });
 };
 
