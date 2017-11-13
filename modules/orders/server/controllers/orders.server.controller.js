@@ -512,19 +512,23 @@ exports.uploadSlip = function (req, res) {
       });
     }
     User.populate(req.order, {
-      path: 'items.product.user'
-    }, function (err, orderRes2) {
-      Shop.populate(orderRes2, {
-        path: 'items.product.shop'
-      }, function (err, orderRes3) {
-        for (var i = 0; i < orderRes3.items.length; i++) {
-          var ids = orderRes3.items[i].product ? orderRes3.items[i].product.user ? orderRes3.items[i].product.user.pushnotifications ? orderRes3.items[i].product.user.pushnotifications : [] : [] : [];
-          if (ids.length > 0) {
-            var sellerMessage = 'ร้าน ' + orderRes3.items[i].product.shop.name + ' มีการอัพเดทสลีป';
-            sentNotiToSeller(sellerMessage, ids);
+      path: 'user'
+    }, function (err, orderRes1) {
+      User.populate(orderRes1, {
+        path: 'items.product.user'
+      }, function (err, orderRes2) {
+        Shop.populate(orderRes2, {
+          path: 'items.product.shop'
+        }, function (err, orderRes3) {
+          for (var i = 0; i < orderRes3.items.length; i++) {
+            var ids = orderRes3.items[i].product ? orderRes3.items[i].product.user ? orderRes3.items[i].product.user.pushnotifications ? orderRes3.items[i].product.user.pushnotifications : [] : [] : [];
+            if (ids.length > 0) {
+              var sellerMessage = 'ร้าน ' + orderRes3.items[i].product.shop.name + ' มีการชำระเงินโดยคุณ ' + orderRes1.user.displayName;
+              sentNotiToSeller(sellerMessage, ids);
+            }
           }
-        }
-        res.jsonp(req.order);
+          res.jsonp(req.order);
+        });
       });
     });
   });
