@@ -286,8 +286,11 @@ exports.signupByTel = function (req, res, next) {
   var userdata = req.body;
   userdata.displayName = userdata.firstName + ' ' + userdata.lastName;
   userdata.username = userdata.tel;
+  if (req.body.isFacebook) {
+    userdata.username = userdata.email;
+  }
   userdata.password = 'Usr#Pass1234';
-  userdata.email = userdata.tel + '@thamturakit.com';
+  userdata.email = userdata.email ? userdata.email : userdata.tel + '@thamturakit.com';
   userdata.provider = 'local';
   var user = new User(userdata);
   var data = new User(user);
