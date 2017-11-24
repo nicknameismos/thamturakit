@@ -74,7 +74,7 @@ describe('Product Model Unit Tests:', function () {
                 rate: 5,
                 created: new Date()
               }],
-              shippings: [shipping],
+              shippings: [{ shippingtype: shipping, shippingprice: 100 }],
               categories: category,
               cod: false,
               shop: shop,
@@ -116,6 +116,15 @@ describe('Product Model Unit Tests:', function () {
 
     it('should be able to show an error when try to save without images', function (done) {
       product.images = [];
+
+      return product.save(function (err) {
+        should.exist(err);
+        done();
+      });
+    });
+
+    it('should be able to show an error when try to save without shippings', function (done) {
+      product.shippings = [];
 
       return product.save(function (err) {
         should.exist(err);

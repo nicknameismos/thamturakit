@@ -69,8 +69,14 @@ var ProductSchema = new Schema({
   },
   shippings: {
     type: [{
-      type: Schema.ObjectId,
-      ref: 'Shipping'
+      shippingtype: {
+        type: Schema.ObjectId,
+        ref: 'Shipping'
+      },
+      shippingprice: {
+        type: Number,
+        default: 0
+      }
     }],
     required: 'Please fill Product Shipping'
   },

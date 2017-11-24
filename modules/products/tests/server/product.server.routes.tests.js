@@ -98,7 +98,7 @@ describe('Product CRUD tests', function () {
               }],
               categories: category,
               shop: shop,
-              shippings: [shipping],
+              shippings: [{ shippingtype: shipping, shippingprice: 100 }],
               cod: false
             };
 

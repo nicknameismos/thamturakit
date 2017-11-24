@@ -38,8 +38,9 @@ exports.read = function (req, res) {
   if (productDB.shippings && productDB.shippings.length > 0) {
     productDB.shippings.forEach(function (shipping) {
       shippings.push({
-        _id: shipping._id,
-        name: shipping.name
+        _id: shipping.shippingtype._id,
+        name: shipping.shippingtype.name,
+        price: shipping.shippingprice
       });
     });
   }
@@ -124,7 +125,7 @@ exports.delete = function (req, res) {
  * Get List Product
  */
 exports.getProductList = function (req, res, next) {
-  Product.find({}, '_id name images price promotionprice percentofdiscount currency categories rate').sort('-created').populate('user', 'displayName').populate('categories').populate('shippings').exec(function (err, products) {
+  Product.find({}, '_id name images price promotionprice percentofdiscount currency categories rate').sort('-created').populate('user', 'displayName').populate('categories').populate('shippings.shippingtype').exec(function (err, products) {
     if (err) {
       return res.status(400).send({
         message: errorHandler.getErrorMessage(err)
@@ -185,7 +186,7 @@ exports.productByID = function (req, res, next, id) {
     });
   }
 
-  Product.findById(id).populate('user', 'displayName').populate('categories').populate('shop').populate('shippings').exec(function (err, product) {
+  Product.findById(id).populate('user', 'displayName').populate('categories').populate('shop').populate('shippings.shippingtype').exec(function (err, product) {
     if (err) {
       return next(err);
     } else if (!product) {

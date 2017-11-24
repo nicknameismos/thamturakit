@@ -92,7 +92,7 @@ describe('Product CRUD tests with Token Base Authen', function () {
               percentofdiscount: 20,
               currency: 'Product currency',
               images: ['Product images'],
-              shippings: [shipping],
+              shippings: [{ shippingtype: shipping, shippingprice: 100 }],
               categories: [category],
               cod: false,
               shop: shop,
@@ -312,6 +312,7 @@ describe('Product CRUD tests with Token Base Authen', function () {
             (product.shippings.length).should.match(1);
             (product.shippings[0]._id).should.match(shipping.id);
             (product.shippings[0].name).should.match(shipping.name);
+            (product.shippings[0].price).should.match(100);
             (product.shop.name).should.match(shop.name);
 
 
@@ -433,7 +434,7 @@ describe('Product CRUD tests with Token Base Authen', function () {
         });
         shippingObj1.save();
         shippingObj2.save();
-        var shippings = [shippingObj1, shippingObj2];
+        var shippings = [{ shippingtype: shippingObj1, shippingprice: 30 }, { shippingtype: shippingObj2, shippingprice: 20 }];
 
         agent.put('/api/products/shippings/' + productSaveRes.body._id)
           .set('authorization', 'Bearer ' + token)
