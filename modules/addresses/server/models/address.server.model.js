@@ -50,6 +50,10 @@ var AddressSchema = new Schema({
     default: '',
     required: 'Please fill Address tel',
   },
+  location: {
+    lat: { type: String },
+    lng: { type: String }
+  },
   created: {
     type: Date,
     default: Date.now

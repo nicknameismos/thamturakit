@@ -58,7 +58,7 @@ describe('Address CRUD tests with Token Base Authen', function () {
         subdistrict: 'คลองถนน',
         district: 'สายไหม',
         province: 'กรุงเทพ',
-        postcode: '120021',
+        postcode: '10220',
         tel: '054841415',
       };
 
@@ -107,6 +107,8 @@ describe('Address CRUD tests with Token Base Authen', function () {
             // Set assertions
             //(addresss[0].user.loginToken).should.equal(token);
             (addresses[0].firstname).should.match(address.firstname);
+            // (addresses[0].location.lat).should.not.match(undefined);
+            // (addresses[0].location.lng).should.not.match(undefined);
 
             // Call the assertion callback
             done();

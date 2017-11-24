@@ -11,7 +11,7 @@ module.exports = function (app) {
   // Addresses Routes
   app.route('/api/addresses').all(core.requiresLoginToken, addressesPolicy.isAllowed)
     .get(addresses.list)
-    .post(addresses.create);
+    .post(addresses.findLocation, addresses.create);
 
   app.route('/api/addresses/:addressId').all(core.requiresLoginToken, addressesPolicy.isAllowed)
     .get(addresses.read)

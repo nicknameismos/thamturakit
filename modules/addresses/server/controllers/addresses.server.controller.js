@@ -12,8 +12,23 @@ var path = require('path'),
 /**
  * Create a Address
  */
+exports.findLocation = function (req, res, next) {
+  var geocoder = require('simple-geocoder');
+  var address = req.body.address + ' ' + req.body.subdistrict + ' ' + req.body.district + ' ' + req.body.province + ' ' + req.body.postcode;
+  var data = new Address(req.body);
+  data.location = data.location ? data.location : {};
+  geocoder.geocode(address, function (success, locations) {
+    if (success) {
+      data.location.lat = locations.y;
+      data.location.lng = locations.x;
+      req.address = data;
+      next();
+    }
+  });
+};
+
 exports.create = function (req, res) {
-  var address = new Address(req.body);
+  var address = new Address(req.address);
   address.user = req.user;
 
   address.save(function (err) {

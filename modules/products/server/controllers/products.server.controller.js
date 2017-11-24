@@ -34,16 +34,16 @@ exports.read = function (req, res) {
   // convert mongoose document to JSON
   var productDB = req.product ? req.product.toJSON() : {};
 
-  var shippings = [];
-  if (productDB.shippings && productDB.shippings.length > 0) {
-    productDB.shippings.forEach(function (shipping) {
-      shippings.push({
-        _id: shipping.shippingtype._id,
-        name: shipping.shippingtype.name,
-        price: shipping.shippingprice
-      });
-    });
-  }
+  // var shippings = [];
+  // if (productDB.shippings && productDB.shippings.length > 0) {
+  //   productDB.shippings.forEach(function (shipping) {
+  //     shippings.push({
+  //       _id: shipping.shippingtype._id,
+  //       name: shipping.shippingtype.name,
+  //       price: shipping.shippingprice
+  //     });
+  //   });
+  // }
   var shop = {
     _id: productDB.shop ? productDB.shop._id : '',
     name: productDB.shop ? productDB.shop.name : '',
@@ -71,7 +71,7 @@ exports.read = function (req, res) {
     images: productDB.images,
     rate: productDB.rate ? productDB.rate : 5,
     reviews: productDB.reviews,
-    shippings: shippings,
+    shippings: productDB.shippings,
     shop: shop,
     // shippings: req.product.shippings,
     // shop: req.product.shop,
