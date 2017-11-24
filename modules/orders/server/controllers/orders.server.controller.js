@@ -21,6 +21,11 @@ var path = require('path'),
  */
 exports.create = function (req, res, next) {
   var order = new Order(req.body);
+  if (req.body.shipping && req.body.shipping.location && req.body.shipping.location.lat && req.body.shipping.location.lng) {
+    order.location.lat = req.body.shipping.location.lat;
+    order.location.lng = req.body.shipping.location.lng;
+    // console.log(order);
+  }
   order.user = req.user;
 
   order.save(function (err) {

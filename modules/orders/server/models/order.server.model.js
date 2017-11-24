@@ -84,6 +84,10 @@ var OrderSchema = new Schema({
     type: String,
     default: 'no image'
   },
+  location: {
+    lat: { type: String },
+    lng: { type: String }
+  },
   created: {
     type: Date,
     default: Date.now

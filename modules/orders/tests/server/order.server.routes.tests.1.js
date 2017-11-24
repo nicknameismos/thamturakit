@@ -63,7 +63,7 @@ describe('Order CRUD tests with Token Base Authen', function () {
           detail: 'วันอังคาร, 1 - วัน อังคาร, 2 ส.ค. 2017 ฟรี',
           name: 'ส่งแบบส่งด่วน',
           price: 0,
-          duedate:2
+          duedate: 2
         }
       },
       {
@@ -71,7 +71,7 @@ describe('Order CRUD tests with Token Base Authen', function () {
           detail: 'วันอังคาร, 1 - วัน อังคาร, 2 ส.ค. 2017 ฟรี',
           name: 'ส่งแบบธรรมดา',
           price: 0,
-          duedate:2          
+          duedate: 2
         }
       }
     ]);
@@ -97,7 +97,11 @@ describe('Order CRUD tests with Token Base Authen', function () {
       subdistrict: 'ลำลูกกา',
       firstname: 'amonrat',
       lastname: 'chantawon',
-      tel: '0934524524'
+      tel: '0934524524',
+      location: {
+        lat: '222',
+        lng: '333'
+      }
     });
     product = new Product([
       {
@@ -192,6 +196,8 @@ describe('Order CRUD tests with Token Base Authen', function () {
           return done(orderSaveErr);
         }
         (orderSaveRes.body.items.length).should.match(1);
+        (orderSaveRes.body.location.lat).should.match(address.location.lat);
+        (orderSaveRes.body.location.lng).should.match(address.location.lng);
 
 
         // Get a list of Orders
